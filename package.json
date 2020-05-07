@@ -1,0 +1,26 @@
+{
+  "name": "featureflag-nodejs",
+  "version": "1.0.0",
+  "description": "Feature flags for nodejs with config file and environment variables support",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kmjayadeep/featureflag-nodejs.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kmjayadeep/featureflag-nodejs/issues"
+  },
+  "homepage": "https://github.com/kmjayadeep/featureflag-nodejs#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^7.1.2"
+  }
+}
