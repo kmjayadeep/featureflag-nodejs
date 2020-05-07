@@ -1,7 +1,7 @@
 const fs = require('fs');
 const dotenv = require('dotenv');
 const debug = require('debug')('featureflag-nodejs');
-
+const convertToCamelCase = require('lodash.camelcase')
 
 
 class FeatureFlags {
@@ -10,7 +10,8 @@ class FeatureFlags {
   // default options: 
   // {
   //   configFile: './features.js',
-  //   envPrefix: 'FEATURE_'
+  //   envPrefix: 'FEATURE_',
+  //   envConvertToCamelCase: true
   // }
   //
 
@@ -23,24 +24,48 @@ class FeatureFlags {
 
     try{
       const config = require(configFile);
-      this.loadConfig(config);
+      this.loadJson(config);
     }catch(err) {
       debug('config file missing');
     }
-
-
+    
+    const envPrefix = options.envPrefix || 'FEATURE_';
+    const envConvertToCamelCase = options.envConvertToCamelCase || true;
+    this.loadEnv(envPrefix, envConvertToCamelCase);
   }
 
   get features() {
     return this._features;
   }
 
-  loadConfig(config) {
+  loadJson(json) {
     this._features = {
       ...this._features,
-      ...config,
+      ...json,
     };
-    debug('loaded config file %o, new feature list is : %o', config, this._features);
+    debug('loaded config file %o, new feature list is : %o', json, this._features);
+  }
+
+  loadEnv(envPrefix, envConvertToCamelCase) {
+    debug('loading feature flags from env using prefix %o and convertToCamelCase %o'
+      , envPrefix, envConvertToCamelCase);
+    const validEnvKeys = Object.keys(process.env)
+      .filter(env => env.startsWith(envPrefix));
+
+    debug(validEnvKeys)
+    const features = {};
+
+    for(const envKey of validEnvKeys) {
+      const trimmed = envKey.replace(envPrefix, '');
+      const key = envConvertToCamelCase ?
+        convertToCamelCase(trimmed) : trimmed;
+      const val = process.env[envKey];
+      features[key] = val;
+      debug('got feature from env %o %o', key, val)
+    }
+
+    this.loadJson(features);
+
   }
 
   // made async for future purpose, to support external feature toggling
